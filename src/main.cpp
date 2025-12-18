@@ -62,6 +62,11 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
         std::string filepath      = configPathEnv ? configPathEnv : "~/.config/hypr/hyprland.lua";
         filepath                  = expandTilde(filepath);
 
+        // Handle module path resolution
+        const char* modulePathEnv = std::getenv("HYPRLUA_MODULES_PATH");
+        std::string modulePath      = modulePathEnv ? modulePathEnv : "/usr/share/hyprlua/modules";
+        modulePath                  = expandTilde(modulePath);
+
         // Set up filesystem monitoring
         std::filesystem::path filePathObj(filepath);
         const std::string     directory = filePathObj.parent_path().string();
@@ -75,7 +80,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
         g_FileWatcher->start();
         sendNotification("[Hyprlua] Plugin initialized successfully.", SUCCESS_COLOR, SUCCESS_TIMEOUT);
 
-        hyprlua::init_lua_runtime("/home/cacarico/ghq/github.com/cacarico/hyprlua/runtime/modules/", "/home/cacarico/.config/hypr/hyprland.lua");
+        hyprlua::init_lua_runtime(modulePath, filepath);
 
         return {"Hyprlua", "A plugin to enable Lua support for Hyprland", "cacarico", "0.1"};
     } catch (const std::exception& e) {

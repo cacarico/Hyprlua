@@ -8,15 +8,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Generate compile_commands.json
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Add Hyprland subproject (no default targets)
-add_subdirectory(extern/Hyprland EXCLUDE_FROM_ALL)
-
 # Required system includes (e.g. libdrm)
 include_directories(/usr/include/libdrm)
 
 # Find PkgConfig and Pixman
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(PIXMAN REQUIRED pixman-1)
+pkg_check_modules(HYPRLAND REQUIRED hyprland)
 
 # Find Threads
 find_package(Threads REQUIRED)
@@ -39,16 +37,14 @@ target_include_directories(hyprlua PRIVATE
   src/
   ${PIXMAN_INCLUDE_DIRS}
   ${LUA_INCLUDE_DIRS}
-  extern/Hyprland/
-  extern/Hyprland/protocols/
-  extern/Hyprland/subprojects/wlroots/include/
-  extern/Hyprland/subprojects/hyprland-protocols/include/
+  ${HYPRLAND_INCLUDE_DIRS}
 )
 
 # Link against required libraries
 target_link_libraries(hyprlua PRIVATE
   ${PIXMAN_LIBRARIES}
   ${LUA_LIBRARIES}
+  ${HYPRLAND_LIBRARIES}
   Threads::Threads
 )
 
