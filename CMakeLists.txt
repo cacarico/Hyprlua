@@ -19,8 +19,8 @@ pkg_check_modules(HYPRLAND REQUIRED hyprland)
 # Find Threads
 find_package(Threads REQUIRED)
 
-# Find Lua >= 5.3 using pkg-config
-pkg_check_modules(LUA REQUIRED lua>=5.3)
+# Find Lua 5.4
+pkg_check_modules(LUA REQUIRED lua5.4)
 
 # Add the plugin as a shared library
 add_library(hyprlua SHARED
