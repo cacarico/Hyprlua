@@ -1,6 +1,6 @@
 --- Logs Module
--- This module handles logs and colors
--- @module logs
+--- This module handles logs and colors
+--- @module "logs"
 
 local logs = {}
 --

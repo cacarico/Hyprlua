@@ -1,6 +1,6 @@
 --- Hyprlua Library
 --- This library handles everything
---- @module hyprlua
+--- @module "hyprlua"
 
 local monitors = require("runtime.modules.monitors")
 local logs = require("runtime.libs.logs")
