@@ -30,11 +30,20 @@ fi
 
 echo "Bumping $CURRENT_VERSION → $NEW_VERSION (Hyprland $HYPRLAND_VERSION)"
 
+# Resolve commit pins
+PLUGIN_COMMIT=$(git rev-parse HEAD)
+HYPRLAND_COMMIT=""
+if command -v gh &>/dev/null && [[ "$HYPRLAND_VERSION" != "unknown" ]]; then
+    HYPRLAND_COMMIT=$(gh api "repos/hyprwm/Hyprland/commits/v${HYPRLAND_VERSION}" --jq '.sha' 2>/dev/null || true)
+fi
+
 # CMakeLists.txt
 sed -i "s/project(hyprlua VERSION ${CURRENT_VERSION}/project(hyprlua VERSION ${NEW_VERSION}/" CMakeLists.txt
 
-# hyprpm.toml
-sed -i "s/^version = \"${CURRENT_VERSION}\"/version = \"${NEW_VERSION}\"/" hyprpm.toml
+# hyprpm.toml — add commit pin if hashes resolved
+if [[ -n "$HYPRLAND_COMMIT" ]]; then
+    sed -i "s|^]$|    [\"${HYPRLAND_COMMIT}\", \"${PLUGIN_COMMIT}\"],\n]|" hyprpm.toml
+fi
 
 # CHANGELOG.md — insert new section after the header block (line 4)
 CHANGELOG_ENTRY="## [${NEW_VERSION}] - ${TODAY} (Hyprland ${HYPRLAND_VERSION})\n\n### Added\n-\n\n### Changed\n-\n\n### Fixed\n-\n"
@@ -42,8 +51,12 @@ sed -i "5s|^|${CHANGELOG_ENTRY}\n|" CHANGELOG.md
 
 echo ""
 echo "Updated files:"
-echo "  CMakeLists.txt  — project version"
-echo "  hyprpm.toml     — version"
+echo "  CMakeLists.txt  — version $CURRENT_VERSION → $NEW_VERSION"
+if [[ -n "$HYPRLAND_COMMIT" ]]; then
+    echo "  hyprpm.toml     — added commit pin (Hyprland $HYPRLAND_VERSION / plugin $(git rev-parse --short HEAD))"
+else
+    echo "  hyprpm.toml     — skipped commit pin (gh CLI unavailable or Hyprland version unknown)"
+fi
 echo "  CHANGELOG.md    — new section for $NEW_VERSION"
 echo ""
 echo "Next steps:"
