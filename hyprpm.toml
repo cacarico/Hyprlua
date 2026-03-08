@@ -1,8 +1,12 @@
-name = "Hyprlua"
+[repository]
+name = "hyprlua"
+authors = ["cacarico"]
+
+[hyprlua]
 description = "Lua 5.4 scripting support for Hyprland"
 authors = ["cacarico"]
-homepage = "https://github.com/cacarico/hyprlua"
-version = "0.0.1"
-
-[build]
-cmake = true
+output = "build/libhyprlua.so"
+build = [
+    "cmake -B build -DCMAKE_BUILD_TYPE=Release",
+    "cmake --build build -j$(nproc)",
+]
