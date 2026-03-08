@@ -3,7 +3,6 @@
 
 #include <hyprland/src/managers/KeybindManager.hpp>
 #include <sol/sol.hpp>
-#include <iostream>
 #include <vector>
 
 namespace hyprlua::modules {
@@ -81,7 +80,6 @@ namespace hyprlua::modules {
     void bind_keybinds(sol::state& lua) {
         log::info("Binding keybinds Lua functions");
         lua.set_function("__hypr_add_bind", &add_bind);
-        std::cout << "[hyprlua] Keybinds module loaded.\n";
         log::debug("Keybinds module successfully bound.");
     }
 

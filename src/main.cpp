@@ -8,8 +8,6 @@
 
 #include <filesystem>
 #include <string>
-#include <stdexcept>
-#include <iostream>
 #include <cstdlib>
 
 /**
@@ -47,15 +45,11 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
         std::filesystem::path filePathObj(filepath);
         const std::string     directory = filePathObj.parent_path().string();
 
-        g_FileWatcher = std::make_unique<FileWatcher>(filepath, directory);
-        if (!g_FileWatcher) {
-            throw std::runtime_error("[Hyprlua] Failed to allocate FileWatcher");
-        }
+        hyprlua::init_lua_runtime(modulePath, filepath);
 
+        g_FileWatcher = std::make_unique<FileWatcher>(filepath, directory);
         g_FileWatcher->start();
         sendNotification("[Hyprlua] Plugin initialized successfully.", SUCCESS_COLOR, SUCCESS_TIMEOUT);
-
-        hyprlua::init_lua_runtime(modulePath, filepath);
 
         /* hyprctl reload clears all keybinds including plugin-added ones */
         static auto s_configReloadedListener = Event::bus()->m_events.config.reloaded.listen([] {
@@ -65,7 +59,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
 
         return {"Hyprlua", "A plugin to enable Lua support for Hyprland", "cacarico", "0.1"};
     } catch (const std::exception& e) {
-        std::cerr << "[Hyprlua] Initialization error: " << e.what() << std::endl;
+        hyprlua::log::error("Initialization error: " + std::string(e.what()));
         return {"Hyprlua", "Initialization failed", "cacarico", "0.1"};
     }
 }
@@ -78,5 +72,5 @@ APICALL EXPORT void PLUGIN_EXIT() {
         }
 
         sendNotification("[Hyprlua] Plugin exiting. Stopped file monitoring.", SUCCESS_COLOR, SUCCESS_TIMEOUT);
-    } catch (const std::exception& e) { std::cerr << "[Hyprlua] Error during exit: " << e.what() << std::endl; }
+    } catch (const std::exception& e) { hyprlua::log::error("Error during exit: " + std::string(e.what())); }
 }

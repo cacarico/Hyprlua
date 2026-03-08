@@ -3,8 +3,8 @@
 #include <hyprland/src/Compositor.hpp>
 #include <hyprland/src/helpers/Color.hpp>
 #include <sol/sol.hpp>
-#include <iostream>
 #include <filesystem>
+#include <mutex>
 #include "logger.hpp"
 
 #include "lua/monitors.hpp"
@@ -19,23 +19,15 @@ namespace hyprlua {
     static bool        initialized = false;
     static std::string s_modules_path;
     static std::string s_user_config_path;
+    static std::mutex  lua_mutex;
 
     sol::state&        get_lua_state() {
         return lua;
     }
 
-    void init_lua_runtime(const std::string& modules_path, const std::string& user_config_path) {
-        s_modules_path     = modules_path;
-        s_user_config_path = user_config_path;
-
-        log::info("init_lua_runtime: called, initialized=" + std::to_string(initialized));
-
-        if (initialized) {
-            std::cerr << "[hyprlua] Lua runtime already initialized." << std::endl;
-            return;
-        }
-
-        std::cout << "[hyprlua] Initializing Lua runtime..." << std::endl;
+    /* Must be called with lua_mutex held */
+    static void init_lua_runtime_locked() {
+        log::info("Initializing Lua runtime...");
 
         lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math, sol::lib::table, sol::lib::string, sol::lib::os);
 
@@ -55,46 +47,59 @@ namespace hyprlua {
 
         try {
             for (const auto& script : {"monitors.lua", "binds.lua"}) {
-                std::string script_path = modules_path + "/" + script;
+                std::string script_path = s_modules_path + "/" + script;
                 if (!fs::exists(script_path)) {
                     sendNotification("Module not found: " + script_path, CHyprColor{1.0, 0.2, 0.2, 1.0}, 5000);
-                    std::cerr << "[hyprlua] Warning: missing " << script << " at " << script_path << std::endl;
+                    log::error("Missing module: " + script_path);
                     continue;
                 }
                 lua.script_file(script_path);
             }
 
-            if (!fs::exists(user_config_path)) {
-                sendNotification("Cant find: " + user_config_path, CHyprColor{1.0, 0.2, 0.2, 1.0}, 5000);
-                std::cerr << "[hyprlua] Error: config not found in " << user_config_path << std::endl;
+            if (!fs::exists(s_user_config_path)) {
+                sendNotification("Cant find: " + s_user_config_path, CHyprColor{1.0, 0.2, 0.2, 1.0}, 5000);
+                log::error("Config not found: " + s_user_config_path);
                 return;
             }
 
-            sol::protected_function_result result = lua.safe_script_file(user_config_path);
+            sol::protected_function_result result = lua.safe_script_file(s_user_config_path);
             if (!result.valid()) {
                 sol::error err = result;
-                std::cerr << "[hyprlua] Error executing config.lua:\n" << err.what() << std::endl;
-                sendNotification("Error executing: " + user_config_path, CHyprColor{1.0, 0.2, 0.2, 1.0}, 5000);
+                log::error("Error executing config: " + std::string(err.what()));
+                sendNotification("Error executing: " + s_user_config_path, CHyprColor{1.0, 0.2, 0.2, 1.0}, 5000);
             }
 
         } catch (const std::exception& e) {
-            std::cerr << "[hyprlua] Runtime initialization failed: " << e.what() << std::endl;
-
-            std::ofstream log("/tmp/hyprlua.log", std::ios::app);
-            if (log.is_open()) {
-                log << "[hyprlua] Exception during runtime initialization: " << e.what() << "\n";
-            }
+            log::error("Runtime initialization failed: " + std::string(e.what()));
         }
 
         initialized = true;
     }
 
+    void init_lua_runtime(const std::string& modules_path, const std::string& user_config_path) {
+        std::lock_guard<std::mutex> lock(lua_mutex);
+
+        s_modules_path     = modules_path;
+        s_user_config_path = user_config_path;
+
+        log::info("init_lua_runtime: called, initialized=" + std::to_string(initialized));
+
+        if (initialized) {
+            log::info("Lua runtime already initialized, skipping");
+            return;
+        }
+
+        init_lua_runtime_locked();
+    }
+
     void reload_lua_runtime() {
+        std::lock_guard<std::mutex> lock(lua_mutex);
+
         log::info("reload_lua_runtime: starting");
         hyprlua::modules::clear_plugin_binds();
         initialized = false;
         lua         = sol::state{};
-        init_lua_runtime(s_modules_path, s_user_config_path);
+        init_lua_runtime_locked();
     }
 
 } // namespace hyprlua

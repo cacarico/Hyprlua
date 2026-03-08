@@ -125,6 +125,21 @@ function TestSerializeConfig:test_col_key_flattening()
 	lu.assertNotStrContains(result, "col = {")
 end
 
+function TestSerializeConfig:test_string_with_quotes()
+	local result = utils.serialize_config({ title = 'say "hello"' }, "misc")
+	lu.assertStrContains(result, 'title = "say \\"hello\\""')
+end
+
+function TestSerializeConfig:test_string_with_backslash()
+	local result = utils.serialize_config({ path = "C:\\Users\\test" }, "misc")
+	lu.assertStrContains(result, 'path = "C:\\\\Users\\\\test"')
+end
+
+function TestSerializeConfig:test_string_with_newline()
+	local result = utils.serialize_config({ text = "line1\nline2" }, "misc")
+	lu.assertStrContains(result, 'text = "line1\\nline2"')
+end
+
 function TestSerializeConfig:test_sorted_keys()
 	local result = utils.serialize_config({ zebra = 1, alpha = 2 }, "section")
 	local alpha_pos = result:find("alpha")

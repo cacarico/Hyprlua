@@ -4,6 +4,13 @@
 
 local utils = {}
 
+--- Escape special characters in a string for safe serialization.
+--- @param s string: The string to escape
+--- @return string: The escaped string
+local function escape_string(s)
+	return (s:gsub("\\", "\\\\"):gsub('"', '\\"'):gsub("\n", "\\n"):gsub("\r", "\\r"))
+end
+
 --- Validate parameter types.
 --- Each entry in `params` is `{ value, expected_type(s), optional }`.
 --- @param params table: Map of param_name → {value, type_or_types, optional?}
@@ -108,7 +115,7 @@ function utils.serialize_config(config, config_type)
 						-- Serialize key-value pair
 						local serialized_value
 						if type(subvalue) == "string" then
-							serialized_value = string.format('"%s"', subvalue)
+							serialized_value = string.format('"%s"', escape_string(subvalue))
 						elseif type(subvalue) == "number" or type(subvalue) == "boolean" then
 							serialized_value = tostring(subvalue)
 						else
@@ -127,7 +134,7 @@ function utils.serialize_config(config, config_type)
 					-- Serialize key-value pair
 					local serialized_value
 					if type(value) == "string" then
-						serialized_value = string.format('"%s"', value)
+						serialized_value = string.format('"%s"', escape_string(value))
 					elseif type(value) == "number" or type(value) == "boolean" then
 						serialized_value = tostring(value)
 					else
