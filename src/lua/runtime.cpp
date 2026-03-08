@@ -40,7 +40,7 @@ namespace hyprlua {
         std::cout << "[hyprlua] Initializing Lua runtime..." << std::endl;
 
         // Open only required libraries for safety
-        lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math, sol::lib::table, sol::lib::string);
+        lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math, sol::lib::table, sol::lib::string, sol::lib::os);
 
         // Register all C++ modules
         hyprlua::modules::bind_monitors(lua);

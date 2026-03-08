@@ -78,7 +78,7 @@ void FileWatcher::watch() {
                 auto* event = reinterpret_cast<inotify_event*>(ptr);
 
                 if (event->len > 0) {
-                    std::string eventFile = m_directory + event->name;
+                    std::string eventFile = m_directory + "/" + event->name;
 
                     if (eventFile == m_filepath) {
                         auto now = std::chrono::steady_clock::now();
