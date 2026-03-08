@@ -33,42 +33,42 @@ The plugin watches your config file and hot-reloads on save.
 ## Building
 
 ```bash
-cmake -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build -j$(nproc)
-# Output: build/libhyprlua.so
+make build
 ```
 
-### Load the plugin
+Outputs `build/libhyprlua.so`.
+
+## Installation
 
 ```bash
-hyprctl plugin load /path/to/hyprlua/build/libhyprlua.so
+make install    # install system-wide (requires sudo)
+make uninstall  # remove installed files
 ```
 
-### Install system-wide
+## Loading the plugin
 
 ```bash
-cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
-cmake --build build -j$(nproc)
-sudo cmake --install build
+make load       # load installed plugin into Hyprland
+make unload     # unload from Hyprland
+make reload     # unload + load
 ```
 
 ## Development
 
-### Local dev without installing
-
-Set env vars so Hyprland uses your local module files instead of the installed ones:
+Build and load the plugin directly from the build directory without installing:
 
 ```bash
-export HYPRLUA_MODULES_PATH=/path/to/hyprlua/runtime/modules
-export HYPRLUA_CONFIG_PATH=~/.config/hypr/hyprland.lua
+make dev-load     # build and load from ./build/
+make dev-unload   # unload local plugin
+make dev-reload   # rebuild and reload
 ```
 
-### Reload the plugin (after C++ changes)
+### Environment variables
 
-```bash
-hyprctl plugin unload /path/to/hyprlua/build/libhyprlua.so
-hyprctl plugin load   /path/to/hyprlua/build/libhyprlua.so
-```
+| Variable | Default | Purpose |
+|---|---|---|
+| `HYPRLUA_CONFIG_PATH` | `~/.config/hypr/hyprland.lua` | User config location |
+| `HYPRLUA_MODULES_PATH` | `/usr/share/hyprlua/modules` | Lua module directory |
 
 ### Watch logs
 
@@ -79,5 +79,17 @@ tail -f /tmp/hyprlua.log
 ### Run tests
 
 ```bash
-cd tests && lua5.4 run_all_tests.lua
+make test
+```
+
+### Lint
+
+```bash
+make lint
+```
+
+### All available commands
+
+```bash
+make help
 ```
