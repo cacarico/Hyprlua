@@ -30,22 +30,42 @@ end)
 
 The plugin watches your config file and hot-reloads on save.
 
-## Building
-
-```bash
-make build
-```
-
-Outputs `build/libhyprlua.so`.
-
 ## Installation
 
+### AUR (Arch Linux)
+
 ```bash
+yay -S hyprlua-git
+```
+
+Then add to your `hyprland.conf`:
+
+```ini
+plugin = /usr/lib/hyprland/plugins/libhyprlua.so
+```
+
+### hyprpm
+
+```bash
+hyprpm add https://github.com/cacarico/hyprlua
+hyprpm enable hyprlua
+```
+
+### From source
+
+```bash
+make build      # outputs build/libhyprlua.so
 make install    # install system-wide (requires sudo)
 make uninstall  # remove installed files
 ```
 
-## Loading the plugin
+Then add to your `hyprland.conf`:
+
+```ini
+plugin = /usr/lib/hyprland/plugins/libhyprlua.so
+```
+
+## Loading the plugin (source installs)
 
 ```bash
 make load       # load installed plugin into Hyprland
