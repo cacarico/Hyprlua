@@ -16,8 +16,8 @@ namespace hyprlua::modules {
 
     static std::vector<PluginBind> g_pluginBinds;
 
-    void add_bind(const std::string& mods, const std::string& key, const std::string& dispatcher, const std::string& args, const std::string& flags_str) {
-        log::info("add_bind: ENTER mods=" + mods + " key=" + key + " dispatcher=" + dispatcher + " args=" + args + " flags=" + flags_str);
+    void add_bind(const std::string& mods, const std::string& key, const std::string& dispatcher, const std::string& args, const std::string& flags_str, const std::string& submap_name) {
+        log::info("add_bind: ENTER mods=" + mods + " key=" + key + " dispatcher=" + dispatcher + " args=" + args + " flags=" + flags_str + " submap=" + submap_name);
 
         if (!g_pKeybindManager) {
             log::error("add_bind: g_pKeybindManager is null!");
@@ -25,11 +25,16 @@ namespace hyprlua::modules {
         }
 
         SKeybind kb;
-        kb.submap  = g_pKeybindManager->getCurrentSubmap();
-        kb.key     = key;
+        kb.submap  = submap_name.empty() ? g_pKeybindManager->getCurrentSubmap() : SSubmap{submap_name};
         kb.modmask = g_pKeybindManager->stringToModMask(mods);
         kb.handler = dispatcher;
         kb.arg     = args;
+
+        if (key == "catchall") {
+            kb.catchAll = true;
+        } else {
+            kb.key = key;
+        }
 
         log::debug("add_bind: submap='" + kb.submap.name + "' modmask=" + std::to_string(kb.modmask));
 
