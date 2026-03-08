@@ -18,8 +18,9 @@ function utils.validate(params)
 		else
 			local value_type = type(value)
 			local valid_type = false
+			expected_types = type(expected_types) == "table" and expected_types or { expected_types }
 
-			for _, expected_type in ipairs(type(expected_types) == "table" and expected_types or { expected_types }) do
+			for _, expected_type in ipairs(expected_types) do
 				if value_type == expected_type then
 					valid_type = true
 					break

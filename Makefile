@@ -37,6 +37,9 @@ dev-unload: ## Unload local plugin from Hyprland
 
 dev-reload: dev-unload dev-load ## Rebuild and reload local plugin
 
+test: ## Run Lua unit tests
+	cd tests && lua5.4 run_all_tests.lua -v
+
 lint: lint-lua ## Lint all files
 
 lint-lua: ## Format and lint Lua files
@@ -45,5 +48,5 @@ lint-lua: ## Format and lint Lua files
 help: ## This help.
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-.PHONY: all build clean install uninstall load unload reload dev-load dev-unload dev-reload lint lint-lua help
+.PHONY: all build clean install uninstall load unload reload dev-load dev-unload dev-reload test lint lint-lua help
 .DEFAULT_GOAL := help
