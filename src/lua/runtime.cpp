@@ -41,9 +41,8 @@ namespace hyprlua {
         }
 
         /* hypr global table — Lua modules attach themselves here (e.g. hypr.monitors) */
-        lua["hypr"]             = lua.create_table();
-        lua["hypr"]["version"]  = "0.1.0";
-        lua["hypr"]["monitors"] = lua.create_table();
+        lua["hypr"]            = lua.create_table();
+        lua["hypr"]["version"] = "0.0.1";
 
         try {
             for (const auto& script : {"monitors.lua", "binds.lua"}) {

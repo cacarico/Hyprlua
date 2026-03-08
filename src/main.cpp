@@ -51,10 +51,10 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
             hyprlua::reload_lua_runtime();
         });
 
-        return {"Hyprlua", "A plugin to enable Lua support for Hyprland", "cacarico", "0.1"};
+        return {"Hyprlua", "A plugin to enable Lua support for Hyprland", "cacarico", "0.0.1"};
     } catch (const std::exception& e) {
         hyprlua::log::error("Initialization error: " + std::string(e.what()));
-        return {"Hyprlua", "Initialization failed", "cacarico", "0.1"};
+        return {"Hyprlua", "Initialization failed", "cacarico", "0.0.1"};
     }
 }
 

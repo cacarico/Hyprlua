@@ -71,6 +71,10 @@ namespace hyprlua::modules {
     }
 
     void clear_plugin_binds() {
+        if (!g_pKeybindManager) {
+            log::error("clear_plugin_binds: g_pKeybindManager is null!");
+            return;
+        }
         log::info("clear_plugin_binds: removing " + std::to_string(g_pluginBinds.size()) + " binds");
         for (auto& b : g_pluginBinds)
             g_pKeybindManager->removeKeybind(b.modmask, b.parsedKey);

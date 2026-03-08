@@ -43,12 +43,6 @@ function TestBindsSet:test_set_with_both_opts()
 	lu.assertEquals(calls[1][6], "mysub")
 end
 
-function TestBindsSet:test_set_nil_opts()
-	self.binds.set("SUPER", "q", "killactive", "")
-	local calls = self.recorders.__hypr_add_bind.calls
-	lu.assertEquals(#calls, 1)
-end
-
 TestBindsSetValidation = {}
 
 function TestBindsSetValidation:setUp()

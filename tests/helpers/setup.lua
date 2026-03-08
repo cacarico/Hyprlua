@@ -21,7 +21,6 @@ local runtime_modules = {
 	"runtime.modules.binds",
 	"runtime.libs.logs",
 	"runtime.libs.utils",
-	"runtime.hyprlua",
 }
 
 --- Require a runtime module with fresh state.

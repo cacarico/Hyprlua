@@ -8,7 +8,7 @@ All notable changes to Hyprlua will be documented in this file.
 - Keybinds module (`hypr.binds.set()`, `hypr.binds.submap()`) with flag and submap support
 - Automatic catchall reset for submaps
 - Keybind persistence across hot-reload (track and clear plugin-added binds)
-- Lua unit test suite (50 tests) using vendored luaunit v3.4
+- Lua unit test suite using vendored luaunit v3.4
 - Mock helpers for `__hypr_*` C++ globals and fresh-require test isolation
 - `make test` target for running the test suite
 - LDoc annotations for all modules
