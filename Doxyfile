@@ -1,0 +1,41 @@
+# Doxyfile for Hyprlua
+
+PROJECT_NAME           = "Hyprlua"
+PROJECT_BRIEF          = "Lua scripting plugin for Hyprland compositor"
+PROJECT_NUMBER         = 0.0.1
+
+OUTPUT_DIRECTORY       = docs/cpp
+INPUT                  = src/
+RECURSIVE              = YES
+FILE_PATTERNS          = *.cpp *.hpp
+
+# Extract everything including private members for full documentation
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+
+# Source browsing
+SOURCE_BROWSER         = YES
+INLINE_SOURCES         = NO
+STRIP_CODE_COMMENTS    = NO
+
+# Output formats
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+HTML_OUTPUT            = html
+
+# Graphs (set to NO if graphviz is not installed)
+HAVE_DOT               = NO
+
+# Warnings
+WARN_IF_UNDOCUMENTED   = YES
+WARN_NO_PARAMDOC       = YES
+
+# Preprocessing
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+PREDEFINED             = APICALL= EXPORT=
+
+# Miscellaneous
+QUIET                  = YES
+SORT_MEMBER_DOCS       = NO

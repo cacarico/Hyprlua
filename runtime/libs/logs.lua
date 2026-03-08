@@ -1,10 +1,10 @@
 --- Logs Module
--- This module handles logs and colors
--- @module logs
+--- ANSI-colored terminal output helpers for Lua-side logging.
+--- @module "logs"
 
 local logs = {}
---
--- ANSI color codes for enhanced terminal output
+
+--- ANSI color codes for terminal output.
 local colors = {
 	reset = "\27[0m",
 	red = "\27[31m",
@@ -16,19 +16,21 @@ local colors = {
 	white = "\27[37m",
 }
 
---- Prints colored message
+--- Print a message with the given ANSI color.
+--- @param color string: ANSI escape sequence
+--- @param message string: Text to print
 local function print_colored(color, message)
 	print(color .. message .. colors.reset)
 end
 
---- Logs error message
----@param message any
+--- Log an error message in red.
+--- @param message string: Error text
 function logs.error(message)
 	print_colored(colors.red, message)
 end
 
---- Logs a message
----@param message any
+--- Log a general message in white.
+--- @param message string: Message text
 function logs.print(message)
 	print_colored(colors.white, message)
 end

@@ -23,6 +23,13 @@ repos:
       - id: stylua
         name: Stylua Formatter
         entry: stylua
-        language: system  # Uses the system's environment
+        language: system
         types: [lua]
         files: \.lua$
+
+      - id: clang-format
+        name: Clang Format
+        entry: clang-format -i
+        language: system
+        types_or: [c, c++]
+        files: \.(cpp|hpp|c|h)$

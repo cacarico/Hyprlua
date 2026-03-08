@@ -1,11 +1,19 @@
 --- Utils Module
--- This module has things that are util
--- @module utils
+--- Shared utility functions for parameter validation, table merging, and serialization.
+--- @module "utils"
 
 local utils = {}
 
---- Validate types
---- @param params (table) Parameters list (e.g., {options = { options, "table", true }})
+--- Escape special characters in a string for safe serialization.
+--- @param s string: The string to escape
+--- @return string: The escaped string
+local function escape_string(s)
+	return (s:gsub("\\", "\\\\"):gsub('"', '\\"'):gsub("\n", "\\n"):gsub("\r", "\\r"))
+end
+
+--- Validate parameter types.
+--- Each entry in `params` is `{ value, expected_type(s), optional }`.
+--- @param params table: Map of param_name → {value, type_or_types, optional?}
 function utils.validate(params)
 	for param_name, param_info in pairs(params) do
 		local value, expected_types, optional = param_info[1], param_info[2], param_info[3]
@@ -17,8 +25,9 @@ function utils.validate(params)
 		else
 			local value_type = type(value)
 			local valid_type = false
+			expected_types = type(expected_types) == "table" and expected_types or { expected_types }
 
-			for _, expected_type in ipairs(type(expected_types) == "table" and expected_types or { expected_types }) do
+			for _, expected_type in ipairs(expected_types) do
 				if value_type == expected_type then
 					valid_type = true
 					break
@@ -37,9 +46,10 @@ function utils.validate(params)
 	end
 end
 
---- Merge tables
---- @param defaults (table) Default List
---- @param opts (table) User options
+--- Deep-merge `opts` into `defaults`, returning the merged table.
+--- Nested tables are merged recursively; scalar values are overwritten.
+--- @param defaults table: Base table with default values
+--- @param opts table: User-supplied overrides
 function utils.merge_tables(defaults, opts)
 	if type(opts) ~= "table" then
 		return defaults
@@ -54,10 +64,11 @@ function utils.merge_tables(defaults, opts)
 	return defaults
 end
 
---- Serialize the configuration table into a formatted string
---- @param config (table) The configuration table to serialize
---- @param config_type (string) Representing the type or name of the configuration (e.g., "config")
---- @return string Returns the serialized table
+--- Serialize a configuration table into a Hyprland-style formatted string.
+--- Handles nested tables and flattens `col.*` sub-keys.
+--- @param config table: The configuration table to serialize
+--- @param config_type string: Section header name (e.g. "general", "decoration")
+--- @return string: The serialized configuration block
 function utils.serialize_config(config, config_type)
 	local serialized_lines = {}
 	local indent_char = "    " -- 4 spaces for indentation
@@ -104,7 +115,7 @@ function utils.serialize_config(config, config_type)
 						-- Serialize key-value pair
 						local serialized_value
 						if type(subvalue) == "string" then
-							serialized_value = string.format('"%s"', subvalue)
+							serialized_value = string.format('"%s"', escape_string(subvalue))
 						elseif type(subvalue) == "number" or type(subvalue) == "boolean" then
 							serialized_value = tostring(subvalue)
 						else
@@ -123,7 +134,7 @@ function utils.serialize_config(config, config_type)
 					-- Serialize key-value pair
 					local serialized_value
 					if type(value) == "string" then
-						serialized_value = string.format('"%s"', value)
+						serialized_value = string.format('"%s"', escape_string(value))
 					elseif type(value) == "number" or type(value) == "boolean" then
 						serialized_value = tostring(value)
 					else
