@@ -22,7 +22,7 @@ class FileWatcher {
     void stop();
 
   private:
-    void watch();
+    void              watch();
 
     std::string       m_filepath;
     std::string       m_directory;

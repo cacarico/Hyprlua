@@ -13,7 +13,7 @@
  * @param color Notification color (RGBA, 0.0-1.0)
  * @param duration Display duration in milliseconds
  */
-void sendNotification(const std::string& message, const CHyprColor& color, int duration);
+void              sendNotification(const std::string& message, const CHyprColor& color, int duration);
 
 extern std::mutex notificationMutex;
 

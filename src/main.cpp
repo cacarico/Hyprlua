@@ -17,10 +17,10 @@
  * @brief Hyprlua plugin entry points (init, exit, version)
  */
 
-const CHyprColor ERROR_COLOR   = {1.0, 0.2, 0.2, 1.0};
-const CHyprColor SUCCESS_COLOR = {0.2, 0.6, 1.0, 1.0};
-const int ERROR_TIMEOUT        = 5000;
-const int SUCCESS_TIMEOUT      = 3000;
+const CHyprColor ERROR_COLOR     = {1.0, 0.2, 0.2, 1.0};
+const CHyprColor SUCCESS_COLOR   = {0.2, 0.6, 1.0, 1.0};
+const int        ERROR_TIMEOUT   = 5000;
+const int        SUCCESS_TIMEOUT = 3000;
 
 APICALL EXPORT std::string PLUGIN_API_VERSION() {
     return HYPRLAND_API_VERSION;
@@ -36,13 +36,13 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
         PHANDLE                = handle;
         const std::string HASH = __hyprland_api_get_hash();
 
-        const char* configPathEnv = std::getenv("HYPRLUA_CONFIG_PATH");
-        std::string filepath      = configPathEnv ? configPathEnv : "~/.config/hypr/hyprland.lua";
-        filepath                  = expandTilde(filepath);
+        const char*       configPathEnv = std::getenv("HYPRLUA_CONFIG_PATH");
+        std::string       filepath      = configPathEnv ? configPathEnv : "~/.config/hypr/hyprland.lua";
+        filepath                        = expandTilde(filepath);
 
         const char* modulePathEnv = std::getenv("HYPRLUA_MODULES_PATH");
-        std::string modulePath      = modulePathEnv ? modulePathEnv : "/usr/share/hyprlua/modules";
-        modulePath                  = expandTilde(modulePath);
+        std::string modulePath    = modulePathEnv ? modulePathEnv : "/usr/share/hyprlua/modules";
+        modulePath                = expandTilde(modulePath);
 
         std::filesystem::path filePathObj(filepath);
         const std::string     directory = filePathObj.parent_path().string();

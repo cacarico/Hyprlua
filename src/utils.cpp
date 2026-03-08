@@ -5,7 +5,7 @@
 
 std::mutex notificationMutex;
 
-void sendNotification(const std::string& message, const CHyprColor& color, int duration) {
+void       sendNotification(const std::string& message, const CHyprColor& color, int duration) {
     std::lock_guard<std::mutex> lock(notificationMutex);
     if (PHANDLE) {
         HyprlandAPI::addNotification(PHANDLE, message, color, duration);

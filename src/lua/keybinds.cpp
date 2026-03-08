@@ -25,7 +25,8 @@ namespace hyprlua::modules {
      *                  n=nonConsuming t=transparent i=ignoreMods
      * @param submap_name Target submap (empty = current)
      */
-    void add_bind(const std::string& mods, const std::string& key, const std::string& dispatcher, const std::string& args, const std::string& flags_str, const std::string& submap_name) {
+    void add_bind(const std::string& mods, const std::string& key, const std::string& dispatcher, const std::string& args, const std::string& flags_str,
+                  const std::string& submap_name) {
         log::info("add_bind: ENTER mods=" + mods + " key=" + key + " dispatcher=" + dispatcher + " args=" + args + " flags=" + flags_str + " submap=" + submap_name);
 
         if (!g_pKeybindManager) {
@@ -49,13 +50,13 @@ namespace hyprlua::modules {
 
         for (char c : flags_str) {
             switch (c) {
-                case 'l': kb.locked       = true; break;
-                case 'r': kb.release      = true; break;
-                case 'e': kb.repeat       = true; break;
-                case 'm': kb.mouse        = true; break;
+                case 'l': kb.locked = true; break;
+                case 'r': kb.release = true; break;
+                case 'e': kb.repeat = true; break;
+                case 'm': kb.mouse = true; break;
                 case 'n': kb.nonConsuming = true; break;
-                case 't': kb.transparent  = true; break;
-                case 'i': kb.ignoreMods   = true; break;
+                case 't': kb.transparent = true; break;
+                case 'i': kb.ignoreMods = true; break;
                 default: log::debug("add_bind: unknown flag '" + std::string(1, c) + "'"); break;
             }
         }
