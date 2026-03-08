@@ -1,6 +1,9 @@
 [repository]
 name = "hyprlua"
 authors = ["cacarico"]
+commit_pins = [
+    ["4b07770b9ef1cceb2e6f56d33538aaffb9186b9c", "14b2c603e71ca45e7e1e256e38f3905fd79c4031"],
+]
 
 [hyprlua]
 description = "Lua 5.4 scripting support for Hyprland"
