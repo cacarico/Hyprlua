@@ -64,8 +64,12 @@ lint-lua-check: ## Run luacheck static analysis
 
 check: lint test ## Run all linting and tests
 
+bump-version: ## Bump version: make bump-version V=X.Y.Z
+	@[ -n "$(V)" ] || (echo "Usage: make bump-version V=X.Y.Z"; exit 1)
+	@./scripts/bump-version.sh $(V)
+
 help: ## This help.
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-.PHONY: all build clean install uninstall load unload reload dev-load dev-unload dev-reload test docs docs-cpp format format-cpp lint lint-lua lint-lua-check check help
+.PHONY: all build clean install uninstall load unload reload dev-load dev-unload dev-reload test docs docs-cpp format format-cpp lint lint-lua lint-lua-check check bump-version help
 .DEFAULT_GOAL := help
