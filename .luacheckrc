@@ -4,11 +4,12 @@ max_line_length = 130
 globals = {
   "vim",
   "use",
-  "hyprlua",  -- Add your global variable here
+  "hyprlua",
+  "hypr",
 }
 
 ignore = {
   "211", -- Example: Ignore unused variable warnings
 }
 
-ignore_files = { "examples/**" }
+ignore_files = { "examples/**", "tests/lib/**" }

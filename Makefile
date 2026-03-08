@@ -15,9 +15,13 @@ build: ## Build Hyprlua
 install: build ## Install system-wide (requires sudo)
 	sudo cmake --install $(BUILD_DIR)
 
-uninstall: ## Remove installed files (requires sudo)
-	sudo rm -f $(PREFIX)/lib/hyprland/plugins/libhyprlua.so
-	sudo rm -rf $(PREFIX)/share/hyprlua
+uninstall: ## Uninstall the plugin (uses CMake install manifest when available)
+	@if [ -f $(BUILD_DIR)/install_manifest.txt ]; then \
+		sudo xargs rm -f < $(BUILD_DIR)/install_manifest.txt; \
+	else \
+		sudo rm -f $(PREFIX)/lib/hyprland/plugins/libhyprlua.so; \
+		sudo rm -rf $(PREFIX)/share/hyprlua; \
+	fi
 
 load: ## Load installed plugin into Hyprland
 	@hyprctl plugin list | grep -q 'Plugin Hyprlua' && hyprctl plugin unload $(PREFIX)/lib/hyprland/plugins/libhyprlua.so || true
@@ -45,13 +49,23 @@ docs: docs-cpp ## Generate all documentation
 docs-cpp: ## Generate C++ docs with Doxygen
 	doxygen Doxyfile
 
-lint: lint-lua ## Lint all files
+format: format-cpp lint-lua ## Format all code (C++ clang-format + Lua stylua)
 
-lint-lua: ## Format and lint Lua files
-	@find . -name "*.lua" -type f -exec stylua {} \;
+format-cpp: ## Format C++ source files with clang-format
+	@find src/ -name "*.cpp" -o -name "*.hpp" | xargs clang-format -i
+
+lint: lint-lua-check ## Run static analysis (luacheck)
+
+lint-lua: ## Format Lua files with stylua
+	@find . -name "*.lua" -not -path "./tests/lib/*" -type f -exec stylua {} \;
+
+lint-lua-check: ## Run luacheck static analysis
+	luacheck . --no-color
+
+check: lint test ## Run all linting and tests
 
 help: ## This help.
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-.PHONY: all build clean install uninstall load unload reload dev-load dev-unload dev-reload test docs docs-cpp lint lint-lua help
+.PHONY: all build clean install uninstall load unload reload dev-load dev-unload dev-reload test docs docs-cpp format format-cpp lint lint-lua lint-lua-check check help
 .DEFAULT_GOAL := help
