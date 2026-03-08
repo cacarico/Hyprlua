@@ -30,6 +30,7 @@ add_library(hyprlua SHARED
   src/utils.cpp
   src/lua/runtime.cpp
   src/lua/monitors.cpp
+  src/lua/keybinds.cpp
 )
 
 # Include directories
@@ -51,4 +52,16 @@ target_link_libraries(hyprlua PRIVATE
 # Output directory for the compiled plugin
 set_target_properties(hyprlua PROPERTIES
   LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/build
+)
+
+# Install targets
+include(GNUInstallDirs)
+
+install(TARGETS hyprlua
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/hyprland/plugins
+)
+
+install(DIRECTORY runtime/modules/
+  DESTINATION ${CMAKE_INSTALL_DATADIR}/hyprlua/modules
+  FILES_MATCHING PATTERN "*.lua"
 )

@@ -1,7 +1,10 @@
 #include "globals.hpp"
 #include "watcher.hpp"
 #include "utils.hpp"
+#include "logger.hpp"
 #include "lua/runtime.hpp"
+
+#include <hyprland/src/event/EventBus.hpp>
 
 #include <filesystem>
 #include <string>
@@ -81,6 +84,13 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
         sendNotification("[Hyprlua] Plugin initialized successfully.", SUCCESS_COLOR, SUCCESS_TIMEOUT);
 
         hyprlua::init_lua_runtime(modulePath, filepath);
+
+        // Re-register Lua keybinds after Hyprland reloads its own config
+        // (hyprctl reload clears all keybinds including plugin-added ones)
+        static auto s_configReloadedListener = Event::bus()->m_events.config.reloaded.listen([] {
+            hyprlua::log::info("Hyprland config reloaded - re-registering Lua keybinds");
+            hyprlua::reload_lua_runtime();
+        });
 
         return {"Hyprlua", "A plugin to enable Lua support for Hyprland", "cacarico", "0.1"};
     } catch (const std::exception& e) {

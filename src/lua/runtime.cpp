@@ -10,20 +10,28 @@
 
 // Modules
 #include "lua/monitors.hpp"
+#include "lua/keybinds.hpp"
 #include "utils.hpp"
 
 namespace hyprlua {
 
     namespace fs = std::filesystem;
 
-    static sol::state lua;
-    static bool       initialized = false;
+    static sol::state  lua;
+    static bool        initialized = false;
+    static std::string s_modules_path;
+    static std::string s_user_config_path;
 
-    sol::state&       get_lua_state() {
+    sol::state&        get_lua_state() {
         return lua;
     }
 
     void init_lua_runtime(const std::string& modules_path, const std::string& user_config_path) {
+        s_modules_path     = modules_path;
+        s_user_config_path = user_config_path;
+
+        log::info("init_lua_runtime: called, initialized=" + std::to_string(initialized));
+
         if (initialized) {
             std::cerr << "[hyprlua] Lua runtime already initialized." << std::endl;
             return;
@@ -36,6 +44,7 @@ namespace hyprlua {
 
         // Register all C++ modules
         hyprlua::modules::bind_monitors(lua);
+        hyprlua::modules::bind_keybinds(lua);
 
         // Now log all monitors:
         auto names = modules::list_monitors();
@@ -51,7 +60,7 @@ namespace hyprlua {
 
         // Load Lua wrappers (monitors.lua, keybinds.lua, general.lua)
         try {
-            for (const auto& script : {"monitors.lua"}) {
+            for (const auto& script : {"monitors.lua", "binds.lua"}) {
                 std::string script_path = modules_path + "/" + script;
                 if (!fs::exists(script_path)) {
                     sendNotification("Module not found: " + script_path, CHyprColor{1.0, 0.2, 0.2, 1.0}, 5000);
@@ -85,6 +94,14 @@ namespace hyprlua {
         }
 
         initialized = true;
+    }
+
+    void reload_lua_runtime() {
+        log::info("reload_lua_runtime: starting");
+        hyprlua::modules::clear_plugin_binds();
+        initialized = false;
+        lua         = sol::state{};
+        init_lua_runtime(s_modules_path, s_user_config_path);
     }
 
 } // namespace hyprlua

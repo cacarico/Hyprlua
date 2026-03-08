@@ -1,5 +1,7 @@
 #include "watcher.hpp"
 #include "utils.hpp"
+#include "lua/runtime.hpp"
+#include "logger.hpp"
 #include <cstring>
 #include <cerrno>
 #include <unistd.h>
@@ -81,7 +83,9 @@ void FileWatcher::watch() {
                     if (eventFile == m_filepath) {
                         auto now = std::chrono::steady_clock::now();
                         if (now - lastEventTime > std::chrono::milliseconds(500)) { // Debounce
-                            sendNotification("File was modified: " + m_filepath, CHyprColor{0.2, 0.6, 1.0, 1.0}, 3000);
+                            hyprlua::log::info("watcher: config changed, reloading Lua runtime");
+                            sendNotification("Reloading Lua config...", CHyprColor{0.2, 0.6, 1.0, 1.0}, 2000);
+                            hyprlua::reload_lua_runtime();
                             lastEventTime = now;
                         }
                     }
