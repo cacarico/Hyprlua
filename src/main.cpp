@@ -15,11 +15,6 @@
  * @brief Hyprlua plugin entry points (init, exit, version)
  */
 
-const CHyprColor ERROR_COLOR     = {1.0, 0.2, 0.2, 1.0};
-const CHyprColor SUCCESS_COLOR   = {0.2, 0.6, 1.0, 1.0};
-const int        ERROR_TIMEOUT   = 5000;
-const int        SUCCESS_TIMEOUT = 3000;
-
 APICALL EXPORT std::string PLUGIN_API_VERSION() {
     return HYPRLAND_API_VERSION;
 }
@@ -49,7 +44,6 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
 
         g_FileWatcher = std::make_unique<FileWatcher>(filepath, directory);
         g_FileWatcher->start();
-        sendNotification("[Hyprlua] Plugin initialized successfully.", SUCCESS_COLOR, SUCCESS_TIMEOUT);
 
         /* hyprctl reload clears all keybinds including plugin-added ones */
         static auto s_configReloadedListener = Event::bus()->m_events.config.reloaded.listen([] {
@@ -71,6 +65,5 @@ APICALL EXPORT void PLUGIN_EXIT() {
             g_FileWatcher.reset();
         }
 
-        sendNotification("[Hyprlua] Plugin exiting. Stopped file monitoring.", SUCCESS_COLOR, SUCCESS_TIMEOUT);
     } catch (const std::exception& e) { hyprlua::log::error("Error during exit: " + std::string(e.what())); }
 }

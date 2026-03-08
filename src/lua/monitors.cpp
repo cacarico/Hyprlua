@@ -1,9 +1,7 @@
 #include "monitors.hpp"
-#include "utils.hpp"
 #include "logger.hpp"
 
 #include <hyprland/src/Compositor.hpp>
-#include <hyprland/src/helpers/Color.hpp>
 #include <hyprland/src/helpers/Monitor.hpp>
 #include <sol/sol.hpp>
 #include <vector>
@@ -20,7 +18,6 @@ namespace hyprlua::modules {
      * @param workspaces Optional workspace IDs to assign
      */
     void add_monitor(const std::string& name, const std::string& resolution, const std::string& position, const double_t& scale, sol::optional<std::vector<double_t>> workspaces) {
-        sendNotification("Applying monitor with Hyprland API", CHyprColor{1.0, 0.5, 0.0, 1.0}, 5000);
         log::info("Starting add_monitor");
 
         std::ostringstream debugLog;
@@ -66,11 +63,9 @@ namespace hyprlua::modules {
 
         monitor->applyMonitorRule(&rule, true);
         log::info("Monitor rule applied: " + name);
-        sendNotification("Monitor rule applied", CHyprColor{0.0, 1.0, 0.0, 1.0}, 3000);
     }
 
     void disable_monitor(const std::string& name) {
-        sendNotification("Disabling monitor", CHyprColor{1.0, 0.2, 0.2, 1.0}, 5000);
         log::info("Disabling monitor: " + name);
 
         SMonitorRule rule;
@@ -86,7 +81,6 @@ namespace hyprlua::modules {
 
         monitor->applyMonitorRule(&rule, true);
         log::info("Monitor disabled: " + name);
-        sendNotification("Monitor disabled", CHyprColor{1.0, 0.0, 0.0, 1.0}, 3000);
     }
 
     std::vector<std::string> list_monitors() {
@@ -100,7 +94,6 @@ namespace hyprlua::modules {
     }
 
     void bind_monitors(sol::state& lua) {
-        sendNotification("Binding monitors module", CHyprColor{0.2, 0.8, 0.2, 1.0}, 4000);
         log::info("Binding monitor Lua functions");
 
         lua.set_function("__hypr_add_monitor", &add_monitor);
