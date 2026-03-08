@@ -1,3 +1,7 @@
+/**
+ * @file logger.hpp
+ * @brief Logging to /tmp/hyprlua.log (thread-safe, timestamped)
+ */
 #pragma once
 
 #include <fstream>
@@ -28,16 +32,8 @@ inline void write(const std::string& level, const std::string& message) {
     stream() << "[" << timestamp() << "] [" << level << "] " << message << std::endl;
 }
 
-inline void info(const std::string& message) {
-    write("INFO", message);
-}
-
-inline void debug(const std::string& message) {
-    write("DEBUG", message);
-}
-
-inline void error(const std::string& message) {
-    write("ERROR", message);
-}
+inline void info(const std::string& message)  { write("INFO", message); }
+inline void debug(const std::string& message) { write("DEBUG", message); }
+inline void error(const std::string& message) { write("ERROR", message); }
 
 } // namespace hyprlua::log

@@ -1,4 +1,3 @@
-// runtime.cpp
 #include "runtime.hpp"
 
 #include <hyprland/src/Compositor.hpp>
@@ -8,7 +7,6 @@
 #include <filesystem>
 #include "logger.hpp"
 
-// Modules
 #include "lua/monitors.hpp"
 #include "lua/keybinds.hpp"
 #include "utils.hpp"
@@ -39,26 +37,22 @@ namespace hyprlua {
 
         std::cout << "[hyprlua] Initializing Lua runtime..." << std::endl;
 
-        // Open only required libraries for safety
         lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math, sol::lib::table, sol::lib::string, sol::lib::os);
 
-        // Register all C++ modules
         hyprlua::modules::bind_monitors(lua);
         hyprlua::modules::bind_keybinds(lua);
 
-        // Now log all monitors:
         auto names = modules::list_monitors();
         log::info("Hyprland reports these monitors:");
         for (auto& n : names) {
             log::info("  • " + n);
         }
 
-        // Optional: inject global table (like nvim)
+        /* hypr global table — Lua modules attach themselves here (e.g. hypr.monitors) */
         lua["hypr"]             = lua.create_table();
         lua["hypr"]["version"]  = "0.1.0";
-        lua["hypr"]["monitors"] = lua.create_table(); // prepare placeholder
+        lua["hypr"]["monitors"] = lua.create_table();
 
-        // Load Lua wrappers (monitors.lua, keybinds.lua, general.lua)
         try {
             for (const auto& script : {"monitors.lua", "binds.lua"}) {
                 std::string script_path = modules_path + "/" + script;
@@ -70,7 +64,6 @@ namespace hyprlua {
                 lua.script_file(script_path);
             }
 
-            // Load user config.lua
             if (!fs::exists(user_config_path)) {
                 sendNotification("Cant find: " + user_config_path, CHyprColor{1.0, 0.2, 0.2, 1.0}, 5000);
                 std::cerr << "[hyprlua] Error: config not found in " << user_config_path << std::endl;

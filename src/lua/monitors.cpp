@@ -12,6 +12,14 @@
 
 namespace hyprlua::modules {
 
+    /**
+     * @brief Apply a monitor rule to a Hyprland output
+     * @param name Output name (e.g. "DP-1", "HDMI-A-1")
+     * @param resolution "WxH" format (e.g. "1920x1080")
+     * @param position "XxY" format (e.g. "0x0")
+     * @param scale Display scale factor
+     * @param workspaces Optional workspace IDs to assign
+     */
     void add_monitor(const std::string& name, const std::string& resolution, const std::string& position, const double_t& scale, sol::optional<std::vector<double_t>> workspaces) {
         sendNotification("Applying monitor with Hyprland API", CHyprColor{1.0, 0.5, 0.0, 1.0}, 5000);
         log::info("Starting add_monitor");
@@ -80,7 +88,6 @@ namespace hyprlua::modules {
 
     std::vector<std::string> list_monitors() {
         std::vector<std::string> names;
-        // iterate the full list (including disabled/fallback outputs)
         for (auto& pMon : g_pCompositor->m_realMonitors) {
             if (!pMon)
                 continue;

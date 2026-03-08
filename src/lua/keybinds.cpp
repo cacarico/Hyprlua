@@ -1,4 +1,3 @@
-// keybinds.cpp
 #include "keybinds.hpp"
 #include "logger.hpp"
 
@@ -16,6 +15,16 @@ namespace hyprlua::modules {
 
     static std::vector<PluginBind> g_pluginBinds;
 
+    /**
+     * @brief Register a keybind with Hyprland's KeybindManager
+     * @param mods Modifier string (e.g. "SUPER", "SUPER SHIFT")
+     * @param key Key name (e.g. "Return", "h") or "catchall"
+     * @param dispatcher Hyprland dispatcher (e.g. "exec", "submap")
+     * @param args Dispatcher arguments
+     * @param flags_str Bind flags: l=locked r=release e=repeat m=mouse
+     *                  n=nonConsuming t=transparent i=ignoreMods
+     * @param submap_name Target submap (empty = current)
+     */
     void add_bind(const std::string& mods, const std::string& key, const std::string& dispatcher, const std::string& args, const std::string& flags_str, const std::string& submap_name) {
         log::info("add_bind: ENTER mods=" + mods + " key=" + key + " dispatcher=" + dispatcher + " args=" + args + " flags=" + flags_str + " submap=" + submap_name);
 
