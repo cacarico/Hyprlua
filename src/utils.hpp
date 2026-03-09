@@ -4,7 +4,6 @@
  */
 #pragma once
 #include <hyprland/src/helpers/Color.hpp>
-#include <mutex>
 #include <string>
 
 /**
@@ -13,9 +12,7 @@
  * @param color Notification color (RGBA, 0.0-1.0)
  * @param duration Display duration in milliseconds
  */
-void              sendNotification(const std::string& message, const CHyprColor& color, int duration);
-
-extern std::mutex notificationMutex;
+void sendNotification(const std::string& message, const CHyprColor& color, int duration);
 
 /// @brief Expand leading ~ to $HOME
 std::string expandTilde(const std::string& path);

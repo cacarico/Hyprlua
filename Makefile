@@ -7,6 +7,7 @@ all: build ## Build the plugin
 
 clean: ## Clear build files
 	@rm -rf $(BUILD_DIR) .cache
+	@find docs -mindepth 1 ! -name 'CNAME' -exec rm -rf {} + 2>/dev/null || true
 
 build: ## Build Hyprlua
 	cmake -B $(BUILD_DIR) -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DCMAKE_INSTALL_PREFIX=$(PREFIX)
@@ -44,10 +45,15 @@ dev-reload: dev-unload dev-load ## Rebuild and reload local plugin
 test: ## Run Lua unit tests
 	cd tests && lua5.4 run_all_tests.lua -v
 
-docs: docs-cpp ## Generate all documentation
+BLOG_DIR ?= ../blog-cacarico
+
+docs: docs-cpp docs-lua ## Generate all documentation
 
 docs-cpp: ## Generate C++ docs with Doxygen
 	doxygen Doxyfile
+
+docs-lua: ## Generate Lua docs with LDoc
+	ldoc .
 
 format: format-cpp lint-lua ## Format all code (C++ clang-format + Lua stylua)
 
@@ -71,5 +77,5 @@ bump-version: ## Bump version: make bump-version V=X.Y.Z
 help: ## This help.
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-.PHONY: all build clean install uninstall load unload reload dev-load dev-unload dev-reload test docs docs-cpp format format-cpp lint lint-lua lint-lua-check check bump-version help
+.PHONY: all build clean install uninstall load unload reload dev-load dev-unload dev-reload test docs docs-cpp docs-lua docs-publish format format-cpp lint lint-lua lint-lua-check check bump-version help
 .DEFAULT_GOAL := help

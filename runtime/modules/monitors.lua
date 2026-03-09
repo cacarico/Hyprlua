@@ -1,6 +1,6 @@
 --- Monitors Module
 --- Handles monitor-related configuration before runtime apply.
---- @module "monitors"
+--- @module monitors
 
 local M = {}
 

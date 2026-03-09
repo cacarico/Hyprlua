@@ -1,6 +1,6 @@
 --- Logs Module
 --- ANSI-colored terminal output helpers for Lua-side logging.
---- @module "logs"
+--- @module logs
 
 local logs = {}
 

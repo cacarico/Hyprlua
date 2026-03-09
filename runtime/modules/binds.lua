@@ -1,7 +1,7 @@
 --- Binds Module
 --- Keybinding registration and submap management via the Hyprland API.
 --- Exposes `hypr.binds.set()` and `hypr.binds.submap()` to user config.
---- @module "binds"
+--- @module binds
 
 local M = {}
 

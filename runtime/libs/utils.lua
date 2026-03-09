@@ -1,6 +1,6 @@
 --- Utils Module
 --- Shared utility functions for parameter validation, table merging, and serialization.
---- @module "utils"
+--- @module utils
 
 local utils = {}
 

@@ -7,7 +7,7 @@
 #include <hyprland/src/plugins/PluginAPI.hpp>
 #include <memory>
 
-inline HANDLE PHANDLE = nullptr;
+extern HANDLE PHANDLE;
 
 class FileWatcher;
 extern std::unique_ptr<FileWatcher> g_FileWatcher;

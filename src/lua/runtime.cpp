@@ -21,15 +21,22 @@ namespace hyprlua {
     static std::string s_user_config_path;
     static std::mutex  lua_mutex;
 
-    sol::state&        get_lua_state() {
-        return lua;
-    }
-
     /* Must be called with lua_mutex held */
     static void init_lua_runtime_locked() {
         log::info("Initializing Lua runtime...");
 
         lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math, sol::lib::table, sol::lib::string, sol::lib::os);
+
+        // Restrict dangerous os functions — user config is trusted, but an attacker who can
+        // write to the modules path would otherwise gain arbitrary shell execution.
+        lua["os"]["execute"] = sol::nil;
+        lua["os"]["remove"]  = sol::nil;
+        lua["os"]["rename"]  = sol::nil;
+        lua["os"]["exit"]    = sol::nil;
+
+        // Restrict package library — prevent loading arbitrary native .so files via require().
+        lua["package"]["loadlib"] = sol::nil;
+        lua["package"]["cpath"]   = "";
 
         hyprlua::modules::bind_monitors(lua);
         hyprlua::modules::bind_keybinds(lua);
@@ -52,8 +59,17 @@ namespace hyprlua {
                     log::error("Missing module: " + script_path);
                     continue;
                 }
-                lua.script_file(script_path);
+                sol::protected_function_result res = lua.safe_script_file(script_path);
+                if (!res.valid()) {
+                    sol::error err = res;
+                    log::error("Error loading module " + std::string(script) + ": " + err.what());
+                    sendNotification("Error loading module: " + std::string(script), CHyprColor{1.0, 0.2, 0.2, 1.0}, 5000);
+                }
             }
+
+            // Runtime is structurally ready once modules have been processed.
+            // Set before user config so retries are possible even if user config has errors.
+            initialized = true;
 
             if (!fs::exists(s_user_config_path)) {
                 sendNotification("Cant find: " + s_user_config_path, CHyprColor{1.0, 0.2, 0.2, 1.0}, 5000);
@@ -70,9 +86,8 @@ namespace hyprlua {
 
         } catch (const std::exception& e) {
             log::error("Runtime initialization failed: " + std::string(e.what()));
+            // initialized remains false so a subsequent reload can retry
         }
-
-        initialized = true;
     }
 
     void init_lua_runtime(const std::string& modules_path, const std::string& user_config_path) {

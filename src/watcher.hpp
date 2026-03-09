@@ -12,6 +12,9 @@
 /**
  * @brief Watches a directory via inotify(7) and triggers Lua runtime
  *        reload when the target config file changes.
+ *
+ *        stop() signals the watcher thread immediately via an eventfd,
+ *        so the compositor is never blocked waiting for a sleep interval.
  */
 class FileWatcher {
   public:
@@ -22,10 +25,11 @@ class FileWatcher {
     void stop();
 
   private:
-    void              watch();
+    void watch();
 
     std::string       m_filepath;
     std::string       m_directory;
     std::thread       m_thread;
     std::atomic<bool> m_keepWatching;
+    int               m_wakeupFd{-1}; ///< eventfd used by stop() to unblock poll()
 };

@@ -2,6 +2,17 @@
 
 All notable changes to Hyprlua will be documented in this file.
 
+## [0.0.2] - 2026-03-09 (Hyprland 0.54.1)
+
+### Added
+-
+
+### Changed
+-
+
+### Fixed
+-
+
 ## [0.0.1] - 2026-03-08
 
 ### Added

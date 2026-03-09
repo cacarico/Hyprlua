@@ -5,7 +5,6 @@
 #pragma once
 
 #include <string>
-#include <sol/sol.hpp>
 
 namespace hyprlua {
 
@@ -14,8 +13,6 @@ namespace hyprlua {
     void init_lua_runtime(const std::string& modules_path, const std::string& user_config_path);
 
     /// Clears keybinds, resets sol2 state, and reinitializes
-    void        reload_lua_runtime();
-
-    sol::state& get_lua_state();
+    void reload_lua_runtime();
 
 } // namespace hyprlua
