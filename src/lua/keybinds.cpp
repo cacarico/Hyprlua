@@ -4,6 +4,7 @@
 #include <hyprland/src/managers/KeybindManager.hpp>
 #include <sol/sol.hpp>
 #include <vector>
+#include <thread>
 
 namespace hyprlua::modules {
 
@@ -33,11 +34,16 @@ namespace hyprlua::modules {
             return;
         }
 
+        const bool isMouse = flags_str.find('m') != std::string::npos;
+
         SKeybind kb;
         kb.submap  = submap_name.empty() ? g_pKeybindManager->getCurrentSubmap() : SSubmap{submap_name};
         kb.modmask = g_pKeybindManager->stringToModMask(mods);
-        kb.handler = dispatcher;
-        kb.arg     = args;
+        // Mouse binds (flag 'm') mirror what Hyprland's native config parser does for bindm:
+        // handler must be "mouse" and arg must be the action name (e.g. "movewindow").
+        // handleKeybinds dispatches via m_dispatchers["mouse"]("1movewindow") on press.
+        kb.handler = isMouse ? "mouse" : dispatcher;
+        kb.arg     = isMouse ? dispatcher : args;
 
         if (key == "catchall") {
             kb.catchAll = true;
@@ -75,10 +81,13 @@ namespace hyprlua::modules {
             log::error("clear_plugin_binds: g_pKeybindManager is null!");
             return;
         }
-        log::info("clear_plugin_binds: removing " + std::to_string(g_pluginBinds.size()) + " binds");
+        log::info("clear_plugin_binds: START thread=" +
+                  std::to_string(std::hash<std::thread::id>{}(std::this_thread::get_id())) +
+                  " binds=" + std::to_string(g_pluginBinds.size()));
         for (auto& b : g_pluginBinds)
             g_pKeybindManager->removeKeybind(b.modmask, b.parsedKey);
         g_pluginBinds.clear();
+        log::info("clear_plugin_binds: DONE");
     }
 
     void bind_keybinds(sol::state& lua) {

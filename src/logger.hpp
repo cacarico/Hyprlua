@@ -11,6 +11,9 @@
 #include <ctime>
 #include <iomanip>
 #include <cstdlib>
+#include <execinfo.h>
+#include <signal.h>
+#include <cstring>
 
 namespace hyprlua::log {
 
@@ -55,6 +58,29 @@ namespace hyprlua::log {
     }
     inline void error(const std::string& message) {
         write("ERROR", message);
+    }
+
+    inline void crash_handler(int sig) {
+        void*  frames[64];
+        int    n    = backtrace(frames, 64);
+        char** syms = backtrace_symbols(frames, n);
+
+        write("FATAL", "Caught signal " + std::to_string(sig) + " (" + strsignal(sig) + ")");
+        if (syms) {
+            for (int i = 0; i < n; ++i)
+                write("FATAL", "  " + std::string(syms[i]));
+            free(syms);
+        }
+        // Re-raise to let the default handler produce core dump / Hyprland secure mode
+        signal(sig, SIG_DFL);
+        raise(sig);
+    }
+
+    inline void install_crash_handler() {
+        signal(SIGSEGV, crash_handler);
+        signal(SIGABRT, crash_handler);
+        signal(SIGBUS,  crash_handler);
+        info("Crash handler installed");
     }
 
 } // namespace hyprlua::log

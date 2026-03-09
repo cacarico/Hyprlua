@@ -11,6 +11,7 @@
 #include <fcntl.h>
 #include <chrono>
 #include <utility>
+#include <hyprland/src/managers/eventLoop/EventLoopManager.hpp>
 
 /**
  * @brief RAII wrapper for a file descriptor.
@@ -123,8 +124,8 @@ void FileWatcher::watch() {
                     if (eventFile == m_filepath) {
                         auto now = std::chrono::steady_clock::now();
                         if (now - lastEventTime > std::chrono::milliseconds(500)) {
-                            hyprlua::log::info("watcher: config changed, reloading Lua runtime");
-                            hyprlua::reload_lua_runtime();
+                            hyprlua::log::info("watcher: config changed, scheduling reload on main thread");
+                            g_pEventLoopManager->doLater([] { hyprlua::reload_lua_runtime(); });
                             lastEventTime = now;
                         }
                     }

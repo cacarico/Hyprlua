@@ -5,6 +5,7 @@
 #include <sol/sol.hpp>
 #include <filesystem>
 #include <mutex>
+#include <thread>
 #include "logger.hpp"
 
 #include "lua/monitors.hpp"
@@ -109,7 +110,8 @@ namespace hyprlua {
     void reload_lua_runtime() {
         std::lock_guard<std::mutex> lock(lua_mutex);
 
-        log::info("reload_lua_runtime: starting");
+        log::info("reload_lua_runtime: START thread=" +
+                  std::to_string(std::hash<std::thread::id>{}(std::this_thread::get_id())));
         hyprlua::modules::clear_plugin_binds();
         initialized = false;
         lua         = sol::state{};

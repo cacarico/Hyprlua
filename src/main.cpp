@@ -33,6 +33,7 @@ APICALL EXPORT std::string PLUGIN_API_VERSION() {
  */
 APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
     try {
+        hyprlua::log::install_crash_handler();
         PHANDLE                = handle;
         const std::string HASH = __hyprland_api_get_hash();
 

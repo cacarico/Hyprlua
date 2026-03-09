@@ -1,37 +1,25 @@
 # Changelog
 
-All notable changes to Hyprlua will be documented in this file.
-
 ## [0.0.2] - 2026-03-09 (Hyprland 0.54.1)
 
-### Added
--
-
-### Changed
--
-
-### Fixed
--
+- Fix mouse drag keybinds (flag `m`) crashing Hyprland — handler must be `"mouse"` with action as arg, mirroring native `bindm` parser
+- Fix file watcher calling `reload_lua_runtime()` from background thread — dispatch via `g_pEventLoopManager->doLater()` instead
+- Fix `os` stdlib not available in user config (`sol::lib::os` was missing from `open_libraries`)
+- Fix file watcher path joining for config change detection
+- Fix `initialized` flag set before user config runs so hot-reload retries on config errors
+- Fix `clean` target not removing generated docs
+- Fix `utils.validate` crash when `expected_types` is a string instead of a table
+- Add crash signal handler (SIGSEGV, SIGABRT, SIGBUS) — writes backtrace to log before re-raising
+- Add keybinds module (`hypr.binds.set`, `hypr.binds.submap`) with flag and submap support
+- Add monitors module (`hypr.monitors.add`)
+- Add Lua sandbox — block `os.execute`, `os.remove`, `os.rename`, `os.exit`, `package.loadlib`, clear `package.cpath`
+- Add per-module error handling with `safe_script_file()` — broken module no longer kills the runtime
+- Add Lua unit test suite (`make test`) using vendored luaunit
+- Add LDoc annotations and `make docs-lua`
+- Rewrite FileWatcher with `poll()` + `eventfd` — `stop()` unblocks instantly, RAII `UniqueFd` for all fds
+- Move log file from `/tmp/hyprlua.log` to `$XDG_RUNTIME_DIR/hyprlua.log`
+- Migrate Lua runtime from LuaJIT to Lua 5.4
 
 ## [0.0.1] - 2026-03-08
 
-### Added
-- Keybinds module (`hypr.binds.set()`, `hypr.binds.submap()`) with flag and submap support
-- Automatic catchall reset for submaps
-- Keybind persistence across hot-reload (track and clear plugin-added binds)
-- Lua unit test suite using vendored luaunit v3.4
-- Mock helpers for `__hypr_*` C++ globals and fresh-require test isolation
-- `make test` target for running the test suite
-- LDoc annotations for all modules
-
-### Changed
-- Migrated Lua runtime from LuaJIT to Lua 5.4
-- Rewrote README with updated build/install/usage instructions
-- Removed Hyprland git submodule from extern/ (uses system headers via pkg-config)
-- Simplified CMakeLists.txt dependency resolution
-
-### Fixed
-- File watcher path joining for config directory detection
-- `os` stdlib now opened in Lua runtime
-- `utils.validate` crash when `expected_types` is a single string instead of a table
-- Hot-reload now properly clears hooks and keybinds before reinitializing
+- Initial release
