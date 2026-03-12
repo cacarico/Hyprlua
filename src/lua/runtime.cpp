@@ -10,6 +10,7 @@
 
 #include "lua/monitors.hpp"
 #include "lua/keybinds.hpp"
+#include "lua/exec.hpp"
 #include "utils.hpp"
 
 namespace hyprlua {
@@ -28,8 +29,8 @@ namespace hyprlua {
 
         lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math, sol::lib::table, sol::lib::string, sol::lib::os);
 
-        // Restrict dangerous os functions — user config is trusted, but an attacker who can
-        // write to the modules path would otherwise gain arbitrary shell execution.
+        // Restrict dangerous os functions. User config is trusted; these are removed to
+        // limit accidental misuse (exec/exec_once are the intentional process-spawning API).
         lua["os"]["execute"] = sol::nil;
         lua["os"]["remove"]  = sol::nil;
         lua["os"]["rename"]  = sol::nil;
@@ -41,6 +42,7 @@ namespace hyprlua {
 
         hyprlua::modules::bind_monitors(lua);
         hyprlua::modules::bind_keybinds(lua);
+        hyprlua::modules::bind_exec(lua);
 
         auto names = modules::list_monitors();
         log::info("Hyprland reports these monitors:");
@@ -53,7 +55,7 @@ namespace hyprlua {
         lua["hypr"]["version"] = HYPRLUA_VERSION;
 
         try {
-            for (const auto& script : {"monitors.lua", "binds.lua"}) {
+            for (const auto& script : {"monitors.lua", "binds.lua", "exec.lua"}) {
                 std::string script_path = s_modules_path + "/" + script;
                 if (!fs::exists(script_path)) {
                     sendNotification("Module not found: " + script_path, CHyprColor{1.0, 0.2, 0.2, 1.0}, 5000);
@@ -83,7 +85,12 @@ namespace hyprlua {
                 sol::error err = result;
                 log::error("Error executing config: " + std::string(err.what()));
                 sendNotification("Error executing: " + s_user_config_path, CHyprColor{1.0, 0.2, 0.2, 1.0}, 5000);
+                // Do not mark startup done — exec_once should retry on the next
+                // successful load rather than being permanently suppressed.
+                return;
             }
+
+            hyprlua::modules::mark_startup_done();
 
         } catch (const std::exception& e) {
             log::error("Runtime initialization failed: " + std::string(e.what()));

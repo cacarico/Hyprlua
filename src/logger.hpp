@@ -13,20 +13,27 @@
 #include <cstdlib>
 #include <execinfo.h>
 #include <signal.h>
-#include <cstring>
+#include <unistd.h>
 
 namespace hyprlua::log {
 
     inline std::ofstream& stream() {
         static std::ofstream file([] {
-            // Prefer XDG_RUNTIME_DIR to avoid symlink attacks on /tmp
+            // Follow Hyprland's convention: logs go in
+            // $XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/
+            // alongside hyprland.log. The directory is created by Hyprland at startup.
             const char* xdgRuntime = std::getenv("XDG_RUNTIME_DIR");
-            std::string path       = xdgRuntime ? std::string(xdgRuntime) + "/hyprlua.log" : "/tmp/hyprlua.log";
+            const char* sig        = std::getenv("HYPRLAND_INSTANCE_SIGNATURE");
+
+            std::string path;
+            if (xdgRuntime && sig)
+                path = std::string(xdgRuntime) + "/hypr/" + sig + "/hyprlua.log";
+            else
+                path = "/tmp/hyprlua.log"; // fallback when running outside Hyprland
+
             std::ofstream f(path, std::ios::app);
-            if (!f.is_open()) {
-                // Fallback: stderr if the log file cannot be opened
+            if (!f.is_open())
                 return std::ofstream{};
-            }
             return f;
         }());
         return file;
@@ -61,16 +68,18 @@ namespace hyprlua::log {
     }
 
     inline void crash_handler(int sig) {
-        void*  frames[64];
-        int    n    = backtrace(frames, 64);
-        char** syms = backtrace_symbols(frames, n);
+        // This handler must use only async-signal-safe functions (see signal-safety(7)).
+        // malloc, std::string, std::mutex, and backtrace_symbols are NOT safe here —
+        // they can deadlock if the signal fires while their internal locks are held.
+        void* frames[64];
+        int   n = backtrace(frames, 64);
 
-        write("FATAL", "Caught signal " + std::to_string(sig) + " (" + strsignal(sig) + ")");
-        if (syms) {
-            for (int i = 0; i < n; ++i)
-                write("FATAL", "  " + std::string(syms[i]));
-            free(syms);
-        }
+        // backtrace_symbols_fd writes directly to an fd with no heap allocation.
+        // STDERR_FILENO is always open and async-signal-safe to write to.
+        const char header[] = "hyprlua: fatal signal, backtrace:\n";
+        ::write(STDERR_FILENO, header, sizeof(header) - 1);
+        backtrace_symbols_fd(frames, n, STDERR_FILENO);
+
         // Re-raise to let the default handler produce core dump / Hyprland secure mode
         signal(sig, SIG_DFL);
         raise(sig);

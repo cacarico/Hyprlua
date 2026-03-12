@@ -30,6 +30,7 @@ add_library(hyprlua SHARED
   src/lua/runtime.cpp
   src/lua/monitors.cpp
   src/lua/keybinds.cpp
+  src/lua/exec.cpp
 )
 
 # Include directories
