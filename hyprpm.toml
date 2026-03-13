@@ -13,5 +13,4 @@ output = "build/libhyprlua.so"
 build = [
     "cmake -B build -DCMAKE_BUILD_TYPE=Release",
     "cmake --build build -j$(nproc)",
-    ["4b07770b9ef1cceb2e6f56d33538aaffb9186b9c", "9c5635d8c82df569f72b05191e07d2d789d9c947"],
 ]

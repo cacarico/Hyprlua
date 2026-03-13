@@ -42,7 +42,7 @@ sed -i "s/project(hyprlua VERSION ${CURRENT_VERSION}/project(hyprlua VERSION ${N
 
 # hyprpm.toml — add commit pin if hashes resolved
 if [[ -n "$HYPRLAND_COMMIT" ]]; then
-    sed -i "s|^]$|    [\"${HYPRLAND_COMMIT}\", \"${PLUGIN_COMMIT}\"],\n]|" hyprpm.toml
+    sed -i "/^commit_pins = \[/,/^\]/{s|^\]$|    [\"${HYPRLAND_COMMIT}\", \"${PLUGIN_COMMIT}\"],\n]|}" hyprpm.toml
 fi
 
 # CHANGELOG.md — insert new section after the header block (line 4)
