@@ -2,8 +2,6 @@
 name = "hyprlua"
 authors = ["cacarico"]
 commit_pins = [
-    ["4b07770b9ef1cceb2e6f56d33538aaffb9186b9c", "14b2c603e71ca45e7e1e256e38f3905fd79c4031"],
-    ["4b07770b9ef1cceb2e6f56d33538aaffb9186b9c", "9c5635d8c82df569f72b05191e07d2d789d9c947"],
     ["4b07770b9ef1cceb2e6f56d33538aaffb9186b9c", "a982048873bbdae5fd3c9d068117004527e2ff10"],
 ]
 
